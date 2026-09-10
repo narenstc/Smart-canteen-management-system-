@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Canteen Ordering System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">🍽️ Smart Canteen</div>
+
+    <nav>
+        <button onclick="showPage('home')"><span class="nav-icon">⌂</span><span>Home</span></button>
+        <button onclick="showPage('menu')"><span class="nav-icon">🍽</span><span>Menu</span></button>
+        <button onclick="showPage('cart')"><span class="nav-icon">🛒</span><span>Cart</span></button>
+        <button onclick="showPage('orders')"><span class="nav-icon">🎫</span><span>Orders</span></button>
+        <button onclick="showPage('bill')"><span class="nav-icon">🧾</span><span>Bill</span></button>
+        <button onclick="showPage('kitchen')"><span class="nav-icon">👨‍🍳</span><span>Kitchen</span></button>
+        <button onclick="showPage('admin')"><span class="nav-icon">⚙</span><span>Admin</span></button>
+        <button onclick="showPage('history')"><span class="nav-icon">🕘</span><span>Order History</span></button>
+        <button onclick="showPage('reports')"><span class="nav-icon">📊</span><span>Reports & Charts</span></button>
+        <button onclick="showPage('qr')"><span class="nav-icon">▦</span><span>Site QR</span></button>
+        <button onclick="showPage('coupon')"><span class="nav-icon">🎟</span><span>Coupon</span></button>
+        <button onclick="showPage('favorites')"><span class="nav-icon">♥</span><span>Favourites</span></button>
+        <button onclick="showPage('rating')"><span class="nav-icon">★</span><span>Food Rating</span></button>
+        <button onclick="showPage('contact')"><span class="nav-icon">☎</span><span>Contact no</span></button>
+    </nav>
+
+    <div class="nav-right">
+        <span id="userDisplay">Guest</span>
+        <button class="cart-btn" onclick="showPage('cart')">
+            🛒 <span id="cartCount">0</span>
+        </button>
+    </div>
+
+</header>
+
+
+<!-- HOME -->
+
+<section id="home" class="page active">
+
+    <div class="hero">
+
+        <div class="hero-content">
+
+            <span class="badge">SMART CAMPUS FOOD SYSTEM</span>
+
+            <h1>
+                Order Food.<br>
+                <span>Skip The Queue.</span>
+            </h1>
+
+            <p>
+                Smart Canteen makes campus food ordering
+                faster, easier and smarter.
+            </p>
+
+            <button class="primary-btn" onclick="showPage('menu')">
+                🍔 Explore Menu
+            </button>
+
+            <button class="secondary-btn" onclick="openLogin()">
+                👤 Student Login
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="features">
+
+        <div class="feature-card">
+            <div>📱</div>
+            <h3>Easy Ordering</h3>
+            <p>Order food from your mobile or laptop.</p>
+        </div>
+
+        <div class="feature-card">
+            <div>⏱️</div>
+            <h3>Save Time</h3>
+            <p>Avoid standing in long queues.</p>
+        </div>
+
+        <div class="feature-card">
+            <div>🎫</div>
+            <h3>Smart Token</h3>
+            <p>Get a unique token for every order.</p>
+        </div>
+
+        <div class="feature-card">
+            <div>🔔</div>
+            <h3>Live Tracking</h3>
+            <p>Track your order preparation status.</p>
+        </div>
+
+    </div>
+
+    <!-- ADDITIONAL HOME INFORMATION - existing content/options unchanged -->
+    <div class="home-info-grid">
+        <div class="home-info-card">
+            <span class="home-info-icon">⚡</span>
+            <div>
+                <h3>Quick & Smart Ordering</h3>
+                <p>Browse the canteen menu, add items to your cart and place your order in a few simple steps.</p>
+            </div>
+        </div>
+        <div class="home-info-card">
+            <span class="home-info-icon">🧾</span>
+            <div>
+                <h3>Digital Bill</h3>
+                <p>View your bill and download a PDF copy with the exact generated date and time.</p>
+            </div>
+        </div>
+        <div class="home-info-card">
+            <span class="home-info-icon">📊</span>
+            <div>
+                <h3>Smart Management</h3>
+                <p>Order History, Reports & Charts, Kitchen and Admin tools are available from the main menu.</p>
+            </div>
+        </div>
+        <div class="home-info-card">
+            <span class="home-info-icon">🔒</span>
+            <div>
+                <h3>Order Information</h3>
+                <p>Keep your token, order status, payment information and order details together in one place.</p>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- MENU -->
+
+<section id="menu" class="page">
+
+    <div class="section-title">
+
+        <h2>🍴 Canteen Menu</h2>
+
+        <p>
+            Fresh food • Affordable price • Quick service
+        </p>
+
+    </div>
+
+
+    <div class="menu-controls">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search food..."
+            oninput="displayMenu()"
+        >
+
+        <select id="categoryFilter" onchange="displayMenu()">
+
+            <option value="all">All Items</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="meals">Meals</option>
+            <option value="snacks">Snacks</option>
+            <option value="drinks">Drinks</option>
+            <option value="dessert">Desserts</option>
+
+        </select>
+
+    </div>
+
+
+    <div id="menuGrid" class="menu-grid"></div>
+
+</section>
+
+
+<!-- CART -->
+
+<section id="cart" class="page">
+
+    <div class="section-title">
+
+        <h2>🛒 Shopping Cart</h2>
+
+        <p>Review your selected food items</p>
+
+    </div>
+
+
+    <div class="cart-container">
+
+        <div id="cartItems"></div>
+
+
+        <div class="cart-summary">
+
+            <h3>Order Summary</h3>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong id="subtotal">₹0</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Discount</span>
+                <strong id="discount">₹0</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>GST (5%)</span>
+                <strong id="gst">₹0</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Service Fee</span>
+                <strong>₹2</strong>
+            </div>
+
+            <hr>
+
+            <div class="summary-row total">
+                <span>Grand Total</span>
+                <strong id="total">₹0</strong>
+            </div>
+
+            <button
+                class="primary-btn full"
+                onclick="checkout()"
+            >
+                Proceed to Checkout
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ORDERS -->
+
+<section id="orders" class="page">
+
+    <div class="section-title">
+
+        <h2>🎫 My Orders</h2>
+
+        <p>Track your current and previous orders</p>
+
+    </div>
+
+    <div id="ordersList"></div>
+
+</section>
+
+
+<!-- BILL -->
+
+<section id="bill" class="page">
+
+    <div class="bill-wrapper">
+
+        <div id="billContent"></div>
+
+        <div class="bill-actions">
+
+            <button class="primary-btn" onclick="printBill()">
+                🖨️ Print Bill
+            </button>
+
+            <button class="secondary-btn" onclick="showPage('orders')">
+                ← Back to Orders
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- KITCHEN -->
+
+<section id="kitchen" class="page">
+
+    <div class="section-title">
+
+        <h2>👨‍🍳 Kitchen Dashboard</h2>
+
+        <p>Manage incoming food orders</p>
+
+    </div>
+
+
+    <div class="dashboard-cards">
+
+        <div class="stat-card">
+            <span>📥</span>
+            <h3 id="pendingCount">0</h3>
+            <p>Pending Orders</p>
+        </div>
+
+        <div class="stat-card">
+            <span>🍳</span>
+            <h3 id="preparingCount">0</h3>
+            <p>Preparing</p>
+        </div>
+
+        <div class="stat-card">
+            <span>✅</span>
+            <h3 id="readyCount">0</h3>
+            <p>Ready</p>
+        </div>
+
+        <div class="stat-card">
+            <span>🎉</span>
+            <h3 id="completedCount">0</h3>
+            <p>Completed</p>
+        </div>
+
+    </div>
+
+
+    <div id="kitchenOrders"></div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="admin" class="page">
+
+    <div class="section-title">
+
+        <h2>📊 Admin Dashboard</h2>
+
+        <p>Canteen management and analytics</p>
+
+    </div>
+
+
+    <div class="dashboard-cards">
+
+        <div class="stat-card">
+            <span>📦</span>
+            <h3 id="adminOrders">0</h3>
+            <p>Total Orders</p>
+        </div>
+
+        <div class="stat-card">
+            <span>💰</span>
+            <h3 id="adminSales">₹0</h3>
+            <p>Total Sales</p>
+        </div>
+
+        <div class="stat-card">
+            <span>🍔</span>
+            <h3 id="adminItems">0</h3>
+            <p>Menu Items</p>
+        </div>
+
+        <div class="stat-card">
+            <span>👨‍🎓</span>
+            <h3 id="adminStudents">0</h3>
+            <p>Students</p>
+        </div>
+
+    </div>
+
+
+    <div class="admin-grid">
+
+        <div class="admin-panel">
+
+            <h3>🔥 Most Ordered Items</h3>
+
+            <div class="popular-item">
+                <span>🍔 Chicken Burger</span>
+                <strong>42 orders</strong>
+            </div>
+
+            <div class="popular-item">
+                <span>🍚 Chicken Rice</span>
+                <strong>38 orders</strong>
+            </div>
+
+            <div class="popular-item">
+                <span>🥪 Sandwich</span>
+                <strong>31 orders</strong>
+            </div>
+
+            <div class="popular-item">
+                <span>🥤 Fresh Lime</span>
+                <strong>28 orders</strong>
+            </div>
+
+        </div>
+
+
+        <div class="admin-panel">
+
+            <h3>📦 Stock Management</h3>
+
+            <div id="stockList"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ORDER HISTORY OPTION (ADDED) -->
+<section id="history" class="page">
+    <div class="section-title">
+        <h2>📜 Order History</h2>
+        <p>View your previous orders or all stored orders in admin view</p>
+    </div>
+    <div class="option-toolbar">
+        <button class="primary-btn" onclick="showMyOrderHistory()">My Order History</button>
+        <button class="secondary-btn" onclick="showAllUsersOrders()">Admin: All Users Orders</button>
+        <button class="secondary-btn" onclick="exportOrderHistoryPDF()">📄 Export PDF</button>
+    </div>
+    <div id="historyList"></div>
+</section>
+
+<!-- REPORTS & CHARTS OPTION (ADDED) -->
+<section id="reports" class="page">
+    <div class="section-title">
+        <h2>📈 Reports & Charts</h2>
+        <p>Sales trends from orders stored in this browser</p>
+    </div>
+    <div class="dashboard-cards">
+        <div class="stat-card"><span>📦</span><h3 id="reportOrders">0</h3><p>Total Orders</p></div>
+        <div class="stat-card"><span>💰</span><h3 id="reportSales">₹0</h3><p>Total Sales</p></div>
+        <div class="stat-card"><span>🧾</span><h3 id="reportAverage">₹0</h3><p>Average Order</p></div>
+        <div class="stat-card"><span>👨‍🎓</span><h3 id="reportStudents">0</h3><p>Students</p></div>
+    </div>
+    <div class="report-panel">
+        <h3>Daily Sales Trend</h3>
+        <canvas id="salesChart" height="120"></canvas>
+    </div>
+    <div class="option-toolbar">
+        <button class="secondary-btn" onclick="exportOrderHistoryPDF()">📄 Export Report PDF</button>
+    </div>
+</section>
+
+<!-- SITE QR OPTION (ADDED) -->
+<section id="qr" class="page">
+    <div class="section-title">
+        <h2>🔗 Scan to Open Smart Canteen</h2>
+        <p>Scan this QR code from another phone to open this website</p>
+    </div>
+    <div class="site-qr-card">
+        <div id="siteQrCode"></div>
+        <p id="siteQrUrl"></p>
+        <button class="primary-btn" onclick="generateSiteQR()">Refresh QR</button>
+    </div>
+</section>
+
+
+<!-- COUPON / OFFERS -->
+<section id="coupon" class="page">
+    <div class="section-title"><h2>🎟️ Coupon / Offers</h2><p>Apply discount codes and view daily offers.</p></div>
+    <div class="option-card">
+        <h3>🔥 Available Offers</h3>
+        <div class="offer-box"><b>WELCOME15</b><span>15% OFF on your first order</span></div>
+        <div class="offer-box"><b>DAILY20</b><span>₹20 OFF on orders above ₹100</span></div>
+        <div class="coupon-row"><input id="couponInput" type="text" placeholder="Enter coupon code"><button class="primary-btn" onclick="applyCoupon()">Apply Coupon</button><button class="secondary-btn" onclick="removeCoupon()">Remove</button></div>
+        <p id="couponStatus" class="coupon-status"></p>
+    </div>
+</section>
+
+<!-- FAVOURITES -->
+<section id="favorites" class="page">
+    <div class="section-title"><h2>❤️ Favourites</h2><p>Your frequently saved foods.</p></div>
+    <div id="favoritesGrid" class="menu-grid"></div>
+</section>
+
+<!-- FOOD RATING -->
+<section id="rating" class="page">
+    <div class="section-title"><h2>⭐ Food Rating & Review</h2><p>Rate food after your order is completed.</p></div>
+    <div id="ratingList"></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="page">
+    <div class="section-title"><h2>🆘 Help / Contact Canteen</h2><p>Need help with an order? Contact the canteen.</p></div>
+    <div class="option-card contact-card">
+        <div class="contact-icon">📞</div><h3>Canteen Support</h3>
+        <p>Call us for order, payment or food-related support.</p>
+        <a class="contact-number" href="tel:9876543210">+91 98765 43210</a>
+        <p>Support Hours: 9:00 AM – 5:00 PM</p>
+    </div>
+</section>
+
+<!-- LOGIN MODAL -->
+
+<div id="loginModal" class="modal">
+
+    <div class="modal-box">
+
+        <button class="close-btn" onclick="closeLogin()">×</button>
+
+        <h2>👋 Student Login</h2>
+
+        <p>Enter your details to continue</p>
+
+        <input
+            type="text"
+            id="studentName"
+            placeholder="Student Name"
+        >
+
+        <input
+            type="text"
+            id="studentId"
+            placeholder="Student ID"
+        >
+
+        <input
+            type="text"
+            id="studentDepartment"
+            placeholder="Department"
+        >
+
+        <button
+            class="primary-btn full"
+            onclick="login()"
+        >
+            Login
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- CHECKOUT MODAL -->
+
+<div id="checkoutModal" class="modal">
+
+    <div class="modal-box">
+
+        <button
+            class="close-btn"
+            onclick="closeCheckout()"
+        >
+            ×
+        </button>
+
+        <h2>💳 Checkout</h2>
+
+        <p>Select your payment method</p>
+
+
+        <label class="payment-option">
+
+            <input
+                type="radio"
+                name="payment"
+                value="UPI"
+                checked
+            >
+
+            📱 UPI / QR Payment
+
+        </label>
+
+
+        <label class="payment-option">
+
+            <input
+                type="radio"
+                name="payment"
+                value="Cash"
+            >
+
+            💵 Pay at Counter
+
+        </label>
+
+
+        <div class="qr-box">
+
+            <div>▦</div>
+
+            <small>
+                Demo UPI QR
+            </small>
+
+        </div>
+
+
+        <button
+            class="primary-btn full"
+            onclick="placeOrder()"
+        >
+            Confirm Order
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- SUCCESS -->
+
+<div id="successModal" class="modal">
+
+    <div class="modal-box success-box">
+
+        <div class="success-icon">✓</div>
+
+        <h2>Order Placed!</h2>
+
+        <p>Your order has been successfully placed.</p>
+
+
+        <div class="token">
+
+            <small>Your Token Number</small>
+
+            <strong id="tokenNumber">SC001</strong>
+
+        </div>
+
+
+        <p>
+            Estimated preparation time:
+            <b>10–15 minutes</b>
+        </p>
+
+
+        <button
+            class="primary-btn full"
+            onclick="closeSuccess()"
+        >
+            View Bill
+        </button>
+
+    </div>
+
+</div>
+
+
+<footer>
+
+    <p>
+        © 2026 Smart Canteen Ordering System
+        | College Project
+    </p>
+
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

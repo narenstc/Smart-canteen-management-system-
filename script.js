@@ -1,4 +1,130 @@
 // ============================================
+// SMART THEATRE — FIREBASE REAL-TIME ORDER SYNC
+// ============================================
+// Paste your Firebase Web App config here. Firebase Web config values are safe
+// to place in frontend code; protect Firestore with proper Security Rules.
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+let firebaseReady = false;
+let firestoreDb = null;
+let adminNotificationListener = null;
+let adminNotificationsEnabled = false;
+let lastKnownFirebaseOrderIds = new Set();
+
+function isFirebaseConfigured() {
+    return firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_") &&
+           firebaseConfig.projectId && !firebaseConfig.projectId.startsWith("YOUR_");
+}
+
+function initFirebase() {
+    const status = document.getElementById("firebaseStatus");
+    if (!window.firebase) {
+        if (status) status.textContent = "⚠️ Firebase library not loaded";
+        return;
+    }
+    if (!isFirebaseConfigured()) {
+        if (status) status.textContent = "⚙️ Firebase setup required — add your Web App config in script.js";
+        return;
+    }
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firestoreDb = firebase.firestore();
+        firebaseReady = true;
+        if (status) status.textContent = "🟢 Firebase connected — real-time order sync ready";
+        startAdminOrderListener();
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+        if (status) status.textContent = "🔴 Firebase connection failed — check config";
+    }
+}
+
+function formatNotificationItems(order) {
+    return (order.items || []).map(item => `${item.name} × ${item.quantity}`).join(" • ");
+}
+
+function showAdminOrderNotification(order, isNew = true) {
+    const title = isNew ? "🔔 New Theatre Order" : "📦 Theatre Order";
+    const body = `Token ${order.token || "-"} • Seat ${order.seat || "-"} • ₹${order.total || 0}\n${formatNotificationItems(order)}`;
+
+    const list = document.getElementById("adminNotificationList");
+    if (list && isNew) {
+        const card = document.createElement("div");
+        card.className = "admin-notification-card";
+        card.innerHTML = `<b>${title}</b><span>🎫 ${order.token || "-"} • 💺 ${order.seat || "-"}</span><span>👤 ${order.customer?.name || "Customer"}</span><span>🍿 ${formatNotificationItems(order)}</span><strong>💰 ₹${order.total || 0} • ${order.paymentStatus || order.payment || "-"}</strong>`;
+        list.prepend(card);
+        while (list.children.length > 5) list.lastElementChild.remove();
+    }
+
+    if (isNew && adminNotificationsEnabled && "Notification" in window && Notification.permission === "granted") {
+        try { new Notification(title, { body }); } catch (e) { console.warn("Browser notification unavailable", e); }
+    }
+}
+
+function startAdminOrderListener() {
+    if (!firebaseReady || !firestoreDb || adminNotificationListener) return;
+    adminNotificationListener = firestoreDb.collection("smart_theatre_orders")
+        .orderBy("createdAt", "desc")
+        .limit(30)
+        .onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                const data = change.doc.data();
+                if (change.type === "added") {
+                    if (!lastKnownFirebaseOrderIds.has(change.doc.id)) {
+                        showAdminOrderNotification(data, true);
+                    }
+                    lastKnownFirebaseOrderIds.add(change.doc.id);
+                }
+            });
+        }, error => {
+            console.error("Firestore listener error:", error);
+            const status = document.getElementById("firebaseStatus");
+            if (status) status.textContent = "🔴 Firestore listener error — check Security Rules/index";
+        });
+}
+
+async function saveOrderToFirebase(order) {
+    if (!firebaseReady || !firestoreDb) return { ok: false, reason: "Firebase not configured" };
+    try {
+        const cleanOrder = JSON.parse(JSON.stringify(order));
+        cleanOrder.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        await firestoreDb.collection("smart_theatre_orders").doc(String(order.id)).set(cleanOrder);
+        return { ok: true };
+    } catch (error) {
+        console.error("Firebase order sync failed:", error);
+        return { ok: false, reason: error.message || "Firestore write failed" };
+    }
+}
+
+async function enableAdminNotifications() {
+    if (!("Notification" in window)) {
+        alert("This browser does not support notifications.");
+        return;
+    }
+    const permission = await Notification.requestPermission();
+    adminNotificationsEnabled = permission === "granted";
+    if (adminNotificationsEnabled) {
+        alert("✅ Admin notifications enabled. Keep the Admin page open for real-time alerts.");
+    } else {
+        alert("Notification permission was not granted. You can still see live orders inside the Admin dashboard.");
+    }
+}
+
+function testAdminNotification() {
+    const demo = { token:"TEST-101", seat:"A5", total:180, paymentStatus:"UPI Paid", customer:{name:"Demo Customer"}, items:[{name:"Classic Popcorn", quantity:1},{name:"Coke", quantity:1}] };
+    showAdminOrderNotification(demo, true);
+    if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("🔔 Smart Theatre Test", { body:"Admin notification is working!" }); } catch (e) {}
+    }
+}
+
+// ============================================
 // SMART CANTEEN ORDERING SYSTEM
 // ============================================
 
@@ -641,6 +767,17 @@ function placeOrder() {
     latestOrder=order;
     localStorage.setItem("theatreOrders",JSON.stringify(orders));
     localStorage.setItem("latestOrder",JSON.stringify(latestOrder));
+
+    // Cross-device sync: customer phone -> Firebase -> admin phone/dashboard.
+    // LocalStorage remains as an offline fallback for the customer side.
+    saveOrderToFirebase(order).then(result => {
+        if (result.ok) {
+            console.log("✅ Order synced to Firebase:", order.token);
+        } else {
+            console.warn("Firebase sync skipped:", result.reason);
+        }
+    });
+
     cart=[]; appliedCoupon=null; demoUpiPaid=false; demoUpiTransactionId=""; localStorage.removeItem("theatreCoupon"); saveCart(); updateCartCount();
     closeCheckout();
     document.getElementById("tokenNumber").textContent=token;
@@ -890,9 +1027,11 @@ function printBill() {
     y += 6;
     doc.text(`Movie: ${safe(order.movie)}  |  Show: ${safe(order.showtime)}`, 15, y);
     y += 6;
-    doc.text(`Screen: ${safe(order.screen)}  |  SEAT: ${safe(order.seat)}`, 15, y);
+    const billScreen = order.screen || order.screenNumber || order.screenName || "-";
+    const billSeat = order.seat || order.seatNumber || "-";
+    doc.text(`Screen: ${safe(billScreen)}  |  SEAT: ${safe(billSeat)}`, 15, y);
     y += 6;
-    doc.text(`DELIVER SNACKS TO SEAT: ${safe(order.seat)}`, 15, y);
+    doc.text(`DELIVER SNACKS TO SEAT: ${safe(billSeat)}`, 15, y);
     y += 9;
 
     doc.setFont(undefined, "bold");
@@ -952,7 +1091,7 @@ function printBill() {
     y += 6;
     doc.text(`Estimated Preparation: ${safe(order.estimatedTime)}`, 15, y);
     y += 6;
-    doc.text(`Delivery Customer: ${safe((order.customer||order.student)?.name)} (${safe((order.customer||order.student)?.customerId || (order.customer||order.student)?.studentId)})`, 15, y);
+    doc.text(`Customer: ${safe((order.customer||order.student)?.name)} (${safe((order.customer||order.student)?.customerId || (order.customer||order.student)?.studentId)})`, 15, y);
     y += 12;
 
     doc.setFontSize(12);
@@ -1041,8 +1180,8 @@ function displayKitchen() {
                     </h3>
 
                     <p>
-                        Student:
-                        ${order.student.name}
+                        Customer:
+                        ${(order.customer || order.student)?.name || "Customer"}
                     </p>
 
                 </div>
@@ -1208,7 +1347,7 @@ function displayAdmin() {
     const uniqueCustomers =
         new Set(
             orders.map(
-                order => order.student.studentId
+                order => (order.student?.customerId || order.student?.studentId || order.customer?.customerId || order.customer?.studentId || "unknown")
             )
         ).size;
 
@@ -1465,3 +1604,9 @@ function generateSiteQR() {
     new QRCode(box, { text: url, width: 220, height: 220 });
     if (urlBox) urlBox.textContent = url;
 }
+
+
+// FIREBASE STARTUP
+window.addEventListener("load", () => {
+    initFirebase();
+});

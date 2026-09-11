@@ -448,7 +448,14 @@
 
         <div class="admin-panel">
 
-            <h3>📦 Stock Management</h3>
+            <h3>🔔 Live Order Notifications</h3>
+            <p style="margin:8px 0;color:#666">Firebase Firestore syncs new orders from customer phones to this admin dashboard in real time.</p>
+            <div id="firebaseStatus" class="firebase-status">Checking Firebase connection…</div>
+            <button class="primary-btn" onclick="enableAdminNotifications()">🔔 Enable Mobile Notifications</button>
+            <button class="secondary-btn" onclick="testAdminNotification()">🧪 Test Notification</button>
+            <div id="adminNotificationList" class="admin-notification-list"></div>
+
+            <h3 style="margin-top:24px">📦 Stock Management</h3>
 
             <div id="stockList"></div>
 
@@ -754,6 +761,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Firebase for cross-device real-time order sync -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
 
 </body>

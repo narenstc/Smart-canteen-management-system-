@@ -6,266 +6,54 @@
 // FOOD DATABASE
 
 const foods = [
-
-    {
-        id: 1,
-        name: "Idli",
-        category: "breakfast",
-        price: 30,
-        stock: 50,
-        image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80",
-        description: "Soft idli with chutney and sambar"
-    },
-
-    {
-        id: 2,
-        name: "Masala Dosa",
-        category: "breakfast",
-        price: 50,
-        stock: 40,
-        image: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80",
-        description: "Crispy dosa with potato masala"
-    },
-
-    {
-        id: 3,
-        name: "Poori Masala",
-        category: "breakfast",
-        price: 45,
-        stock: 35,
-        image: "https://images.unsplash.com/photo-1626132647523-66f5bf380027?auto=format&fit=crop&w=600&q=80",
-        description: "Hot poori served with potato masala"
-    },
-
-    {
-        id: 4,
-        name: "Pongal",
-        category: "breakfast",
-        price: 40,
-        stock: 35,
-        image: "https://images.unsplash.com/photo-1630383249896-424e482df921?auto=format&fit=crop&w=600&q=80",
-        description: "Traditional South Indian ven pongal"
-    },
-
-    {
-        id: 5,
-        name: "Veg Meals",
-        category: "meals",
-        price: 80,
-        stock: 45,
-        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80",
-        description: "Complete vegetarian South Indian meal"
-    },
-
-    {
-        id: 6,
-        name: "Chicken Rice",
-        category: "meals",
-        price: 100,
-        stock: 35,
-        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80",
-        description: "Delicious chicken fried rice"
-    },
-
-    {
-        id: 7,
-        name: "Veg Fried Rice",
-        category: "meals",
-        price: 80,
-        stock: 40,
-        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80",
-        description: "Fried rice with fresh vegetables"
-    },
-
-    {
-        id: 8,
-        name: "Chicken Noodles",
-        category: "meals",
-        price: 100,
-        stock: 30,
-        image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80",
-        description: "Spicy chicken noodles"
-    },
-
-    {
-        id: 9,
-        name: "Chicken Burger",
-        category: "snacks",
-        price: 90,
-        stock: 30,
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
-        description: "Crispy chicken burger"
-    },
-
-    {
-        id: 10,
-        name: "Veg Burger",
-        category: "snacks",
-        price: 70,
-        stock: 35,
-        image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80",
-        description: "Fresh vegetable burger"
-    },
-
-    {
-        id: 11,
-        name: "Sandwich",
-        category: "snacks",
-        price: 60,
-        stock: 40,
-        image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
-        description: "Cheese vegetable sandwich"
-    },
-
-    {
-        id: 12,
-        name: "French Fries",
-        category: "snacks",
-        price: 50,
-        stock: 45,
-        image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80",
-        description: "Crispy golden french fries"
-    },
-
-    {
-        id: 13,
-        name: "Samosa",
-        category: "snacks",
-        price: 20,
-        stock: 60,
-        image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",
-        description: "Crispy potato samosa"
-    },
-
-    {
-        id: 14,
-        name: "Paneer Roll",
-        category: "snacks",
-        price: 70,
-        stock: 25,
-        image: "https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=600&q=80",
-        description: "Spicy paneer roll"
-    },
-
-    {
-        id: 15,
-        name: "Fresh Lime",
-        category: "drinks",
-        price: 30,
-        stock: 50,
-        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80",
-        description: "Refreshing fresh lime juice"
-    },
-
-    {
-        id: 16,
-        name: "Cold Coffee",
-        category: "drinks",
-        price: 60,
-        stock: 30,
-        image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80",
-        description: "Chilled creamy cold coffee"
-    },
-
-    {
-        id: 17,
-        name: "Mango Juice",
-        category: "drinks",
-        price: 50,
-        stock: 35,
-        image: "https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?auto=format&fit=crop&w=600&q=80",
-        description: "Fresh mango juice"
-    },
-
-    {
-        id: 18,
-        name: "Milkshake",
-        category: "drinks",
-        price: 70,
-        stock: 25,
-        image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80",
-        description: "Creamy chilled milkshake"
-    },
-
-    {
-        id: 19,
-        name: "Ice Cream",
-        category: "dessert",
-        price: 40,
-        stock: 30,
-        image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80",
-        description: "Delicious chilled ice cream"
-    },
-
-    {
-        id: 20,
-        name: "Gulab Jamun",
-        category: "dessert",
-        price: 35,
-        stock: 25,
-        image: "https://images.unsplash.com/photo-1601303516534-7a8e1b9d44f8?auto=format&fit=crop&w=600&q=80",
-        description: "Soft sweet gulab jamun"
-    },
-
-    {
-        id: 21,
-        name: "Brownie",
-        category: "dessert",
-        price: 55,
-        stock: 20,
-        image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
-        description: "Chocolate brownie"
-    },
-
-    {
-        id: 22,
-        name: "Tea",
-        category: "drinks",
-        price: 15,
-        stock: 100,
-        image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80",
-        description: "Hot Indian tea"
-    },
-
-    {
-        id: 23,
-        name: "Coffee",
-        category: "drinks",
-        price: 20,
-        stock: 100,
-        image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80",
-        description: "Hot filter coffee"
-    },
-
-    {
-        id: 24,
-        name: "Veg Puff",
-        category: "snacks",
-        price: 30,
-        stock: 40,
-        image: "https://images.unsplash.com/photo-1626776876729-bab4360d5a5a?auto=format&fit=crop&w=600&q=80",
-        description: "Crispy vegetable puff"
-    }
-
+  {id:1,name:"Classic Popcorn",category:"popcorn",price:120,stock:100,image:"https://images.unsplash.com/photo-1585647347384-2593bc35786b?auto=format&fit=crop&w=600&q=80",description:"Freshly popped salted cinema popcorn"},
+  {id:2,name:"Cheese Popcorn",category:"popcorn",price:150,stock:100,image:"https://images.unsplash.com/photo-1578849278619-8e9b5c9f2f26?auto=format&fit=crop&w=600&q=80",description:"Crunchy popcorn with cheesy seasoning"},
+  {id:3,name:"Caramel Popcorn",category:"popcorn",price:160,stock:100,image:"https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=600&q=80",description:"Sweet caramel coated popcorn"},
+  {id:4,name:"Nachos with Cheese",category:"snacks",price:140,stock:100,image:"https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600&q=80",description:"Crispy nachos with warm cheese dip"},
+  {id:5,name:"French Fries",category:"snacks",price:110,stock:100,image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80",description:"Crispy golden fries"},
+  {id:6,name:"Peri Peri Fries",category:"snacks",price:130,stock:100,image:"https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=600&q=80",description:"Fries tossed in spicy peri peri seasoning"},
+  {id:7,name:"Chicken Nuggets",category:"chicken",price:160,stock:100,image:"https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&fit=crop&w=600&q=80",description:"Crispy bite-sized chicken nuggets"},
+  {id:8,name:"Chicken Hot Dog",category:"chicken",price:180,stock:100,image:"https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=600&q=80",description:"Juicy chicken hot dog with sauces"},
+  {id:9,name:"Veg Cheese Burger",category:"burgers",price:170,stock:100,image:"https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=600&q=80",description:"Veg patty with cheese and fresh toppings"},
+  {id:10,name:"Chicken Burger",category:"burgers",price:210,stock:100,image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",description:"Crispy chicken burger with cheese"},
+  {id:11,name:"Veg Sandwich",category:"snacks",price:120,stock:100,image:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",description:"Toasted vegetable and cheese sandwich"},
+  {id:12,name:"Cheese Pizza Slice",category:"pizza",price:150,stock:100,image:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80",description:"Hot cheesy pizza slice"},
+  {id:13,name:"Chicken Pizza Slice",category:"pizza",price:190,stock:100,image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",description:"Chicken topped pizza slice"},
+  {id:14,name:"Samosa",category:"snacks",price:50,stock:100,image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",description:"Crispy samosa with spicy filling"},
+  {id:15,name:"Veg Puff",category:"snacks",price:60,stock:100,image:"https://images.unsplash.com/photo-1626776876729-bab4360d5a5a?auto=format&fit=crop&w=600&q=80",description:"Flaky vegetable puff"},
+  {id:16,name:"Chicken Puff",category:"chicken",price:80,stock:100,image:"https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80",description:"Flaky chicken puff"},
+  {id:17,name:"Coke",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?auto=format&fit=crop&w=600&q=80",description:"Chilled Coca-Cola"},
+  {id:18,name:"Pepsi",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=80",description:"Chilled Pepsi"},
+  {id:19,name:"Fresh Lime Soda",category:"drinks",price:90,stock:100,image:"https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80",description:"Refreshing lime soda"},
+  {id:20,name:"Cold Coffee",category:"drinks",price:120,stock:100,image:"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80",description:"Chilled creamy cold coffee"},
+  {id:21,name:"Chocolate Milkshake",category:"drinks",price:150,stock:100,image:"https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80",description:"Rich chocolate milkshake"},
+  {id:22,name:"Mineral Water",category:"drinks",price:40,stock:100,image:"https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=600&q=80",description:"Chilled mineral water"},
+  {id:23,name:"Ice Cream Cup",category:"desserts",price:100,stock:100,image:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80",description:"Creamy chilled ice cream"},
+  {id:24,name:"Chocolate Brownie",category:"desserts",price:130,stock:100,image:"https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",description:"Warm fudgy chocolate brownie"}
 ];
 
 
 // STORAGE
+// Remove legacy canteen cart data so old foods cannot reappear.
+localStorage.removeItem("canteenCart");
+localStorage.removeItem("canteenOrders");
+localStorage.removeItem("canteenFavorites");
+localStorage.removeItem("canteenCoupon");
 
 let cart =
-    JSON.parse(localStorage.getItem("canteenCart")) || [];
+    JSON.parse(localStorage.getItem("theatreCart")) || [];
 
 let orders =
-    JSON.parse(localStorage.getItem("canteenOrders")) || [];
+    JSON.parse(localStorage.getItem("theatreOrders")) || [];
 
 let currentUser =
-    JSON.parse(localStorage.getItem("canteenUser")) || null;
+    JSON.parse(localStorage.getItem("theatreCustomer") || localStorage.getItem("canteenUser")) || null;
 
 let latestOrder =
     JSON.parse(localStorage.getItem("latestOrder")) || null;
 
-let favorites = JSON.parse(localStorage.getItem("canteenFavorites")) || [];
-let appliedCoupon = JSON.parse(localStorage.getItem("canteenCoupon")) || null;
+let favorites = JSON.parse(localStorage.getItem("theatreFavorites")) || [];
+let appliedCoupon = JSON.parse(localStorage.getItem("theatreCoupon")) || null;
 
 
 // PAGE
@@ -437,7 +225,7 @@ function addToCart(id) {
 function saveCart() {
 
     localStorage.setItem(
-        "canteenCart",
+        "theatreCart",
         JSON.stringify(cart)
     );
 
@@ -709,15 +497,15 @@ function closeLogin() {
 function login() {
 
     const name =
-        document.getElementById("studentName")
+        document.getElementById("customerName")
         .value.trim();
 
     const id =
-        document.getElementById("studentId")
+        document.getElementById("customerId")
         .value.trim();
 
     const department =
-        document.getElementById("studentDepartment")
+        document.getElementById("customerDetails")
         .value.trim();
 
 
@@ -729,15 +517,11 @@ function login() {
     }
 
 
-    currentUser = {
-        name,
-        studentId: id,
-        department
-    };
+    currentUser = { name, studentId: id, department, customerName: name, customerId: id, customerDetails: department };
 
 
     localStorage.setItem(
-        "canteenUser",
+        "theatreCustomer",
         JSON.stringify(currentUser)
     );
 
@@ -887,7 +671,7 @@ function placeOrder() {
 
 
     localStorage.setItem(
-        "canteenOrders",
+        "theatreOrders",
         JSON.stringify(orders)
     );
 
@@ -900,7 +684,7 @@ function placeOrder() {
     cart = [];
 
     appliedCoupon = null;
-    localStorage.removeItem("canteenCoupon");
+    localStorage.removeItem("theatreCoupon");
     saveCart();
 
     updateCartCount();
@@ -985,9 +769,7 @@ function displayOrders() {
                             🎫 ${order.token}
                         </h3>
 
-                        <small>
-                            ${order.time}
-                        </small>
+                        <small>${order.time}</small><p class="order-location">🎬 ${order.movie || "Movie"} • 🕒 ${order.showtime || "-"} • 🎞️ ${order.screen || "-"} • 💺 ${order.seat || "-"}</p>
 
                     </div>
 
@@ -1452,7 +1234,7 @@ function printBill() {
 
     const invoiceName = safe(order.invoice).replace(/[^a-z0-9_-]/gi, "_");
     const fileDate = `${generatedAt.getFullYear()}-${pad(generatedAt.getMonth() + 1)}-${pad(generatedAt.getDate())}`;
-    doc.save(`Smart_Canteen_Bill_${invoiceName}_${fileDate}.pdf`);
+    doc.save(`Smart_Theatre_Bill_${invoiceName}_${fileDate}.pdf`);
 
 }
 
@@ -1659,7 +1441,7 @@ function updateOrderStatus(id,status) {
 
 
     localStorage.setItem(
-        "canteenOrders",
+        "theatreOrders",
         JSON.stringify(orders)
     );
 
@@ -1696,7 +1478,7 @@ function displayAdmin() {
         );
 
 
-    const uniqueStudents =
+    const uniqueCustomers =
         new Set(
             orders.map(
                 order => order.student.studentId
@@ -1716,8 +1498,8 @@ function displayAdmin() {
         .textContent = foods.length;
 
 
-    document.getElementById("adminStudents")
-        .textContent = uniqueStudents;
+    document.getElementById("adminCustomers")
+        .textContent = uniqueCustomers;
 
 
     const stock =
@@ -1763,7 +1545,7 @@ function applyCoupon() {
     if (code === "DAILY20") { appliedCoupon = { code }; }
     else if (code === "WELCOME15") { appliedCoupon = { code }; }
     else return alert("Invalid coupon code.");
-    localStorage.setItem("canteenCoupon", JSON.stringify(appliedCoupon));
+    localStorage.setItem("theatreCoupon", JSON.stringify(appliedCoupon));
     displayCoupon();
     alert(`${code} applied successfully!`);
     if (cart.length) displayCart();
@@ -1771,14 +1553,14 @@ function applyCoupon() {
 
 function removeCoupon() {
     appliedCoupon = null;
-    localStorage.removeItem("canteenCoupon");
+    localStorage.removeItem("theatreCoupon");
     displayCoupon();
     if (cart.length) displayCart();
 }
 
 function toggleFavorite(id) {
     favorites = favorites.includes(id) ? favorites.filter(x => x !== id) : [...favorites, id];
-    localStorage.setItem("canteenFavorites", JSON.stringify(favorites));
+    localStorage.setItem("theatreFavorites", JSON.stringify(favorites));
     displayMenu();
     if (document.getElementById("favorites")?.classList.contains("active")) displayFavorites();
 }
@@ -1808,14 +1590,14 @@ function displayRatings() {
 
 function rateOrder(id, rating) {
     const order = orders.find(o => o.id === id); if (!order) return;
-    order.rating = rating; localStorage.setItem("canteenOrders", JSON.stringify(orders));
+    order.rating = rating; localStorage.setItem("theatreOrders", JSON.stringify(orders));
     if (latestOrder?.id === id) { latestOrder.rating = rating; localStorage.setItem("latestOrder", JSON.stringify(latestOrder)); }
     displayRatings();
 }
 function saveReview(id) {
     const order = orders.find(o => o.id === id); if (!order) return;
     const el = document.getElementById(`review-${id}`); order.review = el ? el.value.trim() : "";
-    localStorage.setItem("canteenOrders", JSON.stringify(orders));
+    localStorage.setItem("theatreOrders", JSON.stringify(orders));
     alert("Thanks! Your food review has been saved ⭐");
 }
 function displayContact() { /* Contact is static and also printed on bills. */ }
@@ -1894,7 +1676,7 @@ function displayReports() {
     set("reportOrders", totalOrders);
     set("reportSales", `₹${totalSales.toFixed(2)}`);
     set("reportAverage", `₹${avg.toFixed(2)}`);
-    set("reportStudents", students);
+    set("reportCustomers", students);
 
     const canvas = document.getElementById("salesChart");
     if (!canvas || typeof Chart === "undefined") return;
@@ -1919,7 +1701,7 @@ function exportOrderHistoryPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text("Smart Canteen - Order History", 14, 18);
+    doc.text("Smart Theatre - Order History", 14, 18);
     doc.setFontSize(9);
     let y = 28;
     orders.slice().reverse().forEach((o, idx) => {
@@ -1932,7 +1714,7 @@ function exportOrderHistoryPDF() {
         doc.text(wrapped, 14, y); y += wrapped.length * 4 + 5;
         doc.line(14, y, 196, y); y += 5;
     });
-    doc.save("smart-canteen-order-history.pdf");
+    doc.save("smart-theatre-order-history.pdf");
 }
 
 function generateSiteQR() {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Canteen Ordering System</title>
+<title>Smart Theatre Food Ordering Management System</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,7 +11,7 @@
 
 <header class="navbar">
 
-    <div class="logo">🍽️ Smart Canteen</div>
+    <div class="logo">🎬 Smart Theatre</div>
 
     <nav>
         <button onclick="showPage('home')"><span class="nav-icon">⌂</span><span>Home</span></button>
@@ -48,7 +48,7 @@
 
         <div class="hero-content">
 
-            <span class="badge">SMART CAMPUS FOOD SYSTEM</span>
+            <span class="badge">SMART THEATRE FOOD ORDERING MANAGEMENT SYSTEM</span>
 
             <h1>
                 Order Food.<br>
@@ -56,22 +56,63 @@
             </h1>
 
             <p>
-                Smart Canteen makes campus food ordering
-                faster, easier and smarter.
+                Smart Theatre makes movie snack ordering
+                faster, easier and smarter — delivered directly to your seat.
             </p>
 
             <button class="primary-btn" onclick="showPage('menu')">
-                🍔 Explore Menu
+                🍿 Explore Theatre Menu
             </button>
 
             <button class="secondary-btn" onclick="openLogin()">
-                👤 Student Login
+                👤 Customer Login
             </button>
 
         </div>
 
     </div>
 
+
+
+    <div class="theatre-photo-wrap" style="margin-top:28px;">
+        <img class="theatre-photo" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85" alt="Realistic cinema theatre interior">
+    </div>
+
+    <div class="theatre-details">
+        <div class="theatre-details-head">
+            <div>
+                <span class="badge dark-badge">NOW SERVING</span>
+                <h2>🎬 Choose Your Theatre</h2>
+                <p>Select a theatre, screen and seat during checkout. Your snacks are delivered directly to your seat.</p>
+            </div>
+        </div>
+        <div class="theatre-grid">
+            <div class="theatre-card">
+                <div class="theatre-logo">🎥</div>
+                <div>
+                    <h3>PVR INOX Cinemas</h3>
+                    <p>📍 Vishaal de Mal, Gokhale Road, Madurai</p>
+                    <span>Premium screens • Recliner seating • Food delivery</span>
+                </div>
+            </div>
+            <div class="theatre-card">
+                <div class="theatre-logo">🎞️</div>
+                <div>
+                    <h3>INOX Cinemas</h3>
+                    <p>📍 Milan'em Mall, Madurai</p>
+                    <span>Dolby audio • Comfortable seats • Quick snack service</span>
+                </div>
+            </div>
+            <div class="theatre-card">
+                <div class="theatre-logo">🍿</div>
+                <div>
+                    <h3>Vettri Cinemas</h3>
+                    <p>📍 Madurai, Tamil Nadu</p>
+                    <span>Family entertainment • Hot snacks • Seat delivery</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="features">
 
@@ -101,13 +142,18 @@
 
     </div>
 
+    <section class="now-showing"><div class="section-title compact-title"><h2>🎞️ Now Showing</h2><p>Choose a movie before selecting your screen, show time and seat.</p></div><div class="movie-grid">
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=85" alt="Cinema screen"><div><span class="movie-tag">2D</span><h3>Evening Movie Show</h3><p>Family • Entertainment</p><b>Today • 6:30 PM</b></div></div>
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85" alt="Cinema hall"><div><span class="movie-tag">3D</span><h3>Weekend Blockbuster</h3><p>Action • Adventure</p><b>Today • 9:30 PM</b></div></div>
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=85" alt="Movie theatre"><div><span class="movie-tag">IMAX</span><h3>Premium Cinema Show</h3><p>Adventure • Sci-Fi</p><b>Tomorrow • 3:00 PM</b></div></div></div></section>
+
     <!-- ADDITIONAL HOME INFORMATION - existing content/options unchanged -->
     <div class="home-info-grid">
         <div class="home-info-card">
             <span class="home-info-icon">⚡</span>
             <div>
                 <h3>Quick & Smart Ordering</h3>
-                <p>Browse the canteen menu, add items to your cart and place your order in a few simple steps.</p>
+                <p>Browse the theatre menu, add items to your cart and place your order in a few simple steps.</p>
             </div>
         </div>
         <div class="home-info-card">
@@ -142,10 +188,10 @@
 
     <div class="section-title">
 
-        <h2>🍴 Canteen Menu</h2>
+        <h2>🍿 Theatre Food & Snacks</h2>
 
         <p>
-            Fresh food • Affordable price • Quick service
+            Fresh movie snacks • Easy ordering • Seat delivery
         </p>
 
     </div>
@@ -163,8 +209,6 @@
         <select id="categoryFilter" onchange="displayMenu()">
 
             <option value="all">All Items</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="meals">Meals</option>
             <option value="snacks">Snacks</option>
             <option value="drinks">Drinks</option>
             <option value="dessert">Desserts</option>
@@ -187,7 +231,7 @@
 
         <h2>🛒 Shopping Cart</h2>
 
-        <p>Review your selected food items</p>
+        <p>Review your selected theatre snacks</p>
 
     </div>
 
@@ -339,7 +383,7 @@
 
         <h2>📊 Admin Dashboard</h2>
 
-        <p>Canteen management and analytics</p>
+        <p>Theatre management and analytics</p>
 
     </div>
 
@@ -367,7 +411,7 @@
         <div class="stat-card">
             <span>👨‍🎓</span>
             <h3 id="adminStudents">0</h3>
-            <p>Students</p>
+            <p>Customers</p>
         </div>
 
     </div>
@@ -439,7 +483,7 @@
         <div class="stat-card"><span>📦</span><h3 id="reportOrders">0</h3><p>Total Orders</p></div>
         <div class="stat-card"><span>💰</span><h3 id="reportSales">₹0</h3><p>Total Sales</p></div>
         <div class="stat-card"><span>🧾</span><h3 id="reportAverage">₹0</h3><p>Average Order</p></div>
-        <div class="stat-card"><span>👨‍🎓</span><h3 id="reportStudents">0</h3><p>Students</p></div>
+        <div class="stat-card"><span>👨‍🎓</span><h3 id="reportStudents">0</h3><p>Customers</p></div>
     </div>
     <div class="report-panel">
         <h3>Daily Sales Trend</h3>
@@ -453,7 +497,7 @@
 <!-- SITE QR OPTION (ADDED) -->
 <section id="qr" class="page">
     <div class="section-title">
-        <h2>🔗 Scan to Open Smart Canteen</h2>
+        <h2>🔗 Scan to Open Smart Theatre</h2>
         <p>Scan this QR code from another phone to open this website</p>
     </div>
     <div class="site-qr-card">
@@ -490,10 +534,10 @@
 
 <!-- CONTACT -->
 <section id="contact" class="page">
-    <div class="section-title"><h2>🆘 Help / Contact Canteen</h2><p>Need help with an order? Contact the canteen.</p></div>
+    <div class="section-title"><h2>🆘 Help / Contact Theatre</h2><p>Need help with an order? Contact theatre food support.</p></div>
     <div class="option-card contact-card">
-        <div class="contact-icon">📞</div><h3>Canteen Support</h3>
-        <p>Call us for order, payment or food-related support.</p>
+        <div class="contact-icon">📞</div><h3>Theatre Food Support</h3>
+        <p>Call us for order, payment or snack delivery support.</p>
         <a class="contact-number" href="tel:9876543210">+91 98765 43210</a>
         <p>Support Hours: 9:00 AM – 5:00 PM</p>
     </div>
@@ -507,26 +551,26 @@
 
         <button class="close-btn" onclick="closeLogin()">×</button>
 
-        <h2>👋 Student Login</h2>
+        <h2>👋 Customer Login</h2>
 
         <p>Enter your details to continue</p>
 
         <input
             type="text"
-            id="studentName"
-            placeholder="Student Name"
+            id="customerName"
+            placeholder="Customer Name"
         >
 
         <input
             type="text"
-            id="studentId"
-            placeholder="Student ID"
+            id="customerId"
+            placeholder="Customer ID"
         >
 
         <input
             type="text"
-            id="studentDepartment"
-            placeholder="Department"
+            id="customerDetails"
+            placeholder="Department / Details"
         >
 
         <button
@@ -556,7 +600,35 @@
 
         <h2>💳 Checkout</h2>
 
-        <p>Select your payment method</p>
+        <p>Select your theatre and seat. Delivery staff will use these details to bring the ordered snacks.</p>
+
+        <label class="field-label">🎬 Theatre</label>
+        <select id="theatreSelect" class="checkout-select">
+            <option value="PVR INOX Cinemas — Vishaal de Mal, Madurai">PVR INOX Cinemas — Vishaal de Mal, Madurai</option>
+            <option value="INOX Cinemas — Milan'em Mall, Madurai">INOX Cinemas — Milan'em Mall, Madurai</option>
+            <option value="Vettri Cinemas — Madurai">Vettri Cinemas — Madurai</option>
+        </select>
+
+        <label class="field-label">🎬 Movie</label><select id="movieSelect" class="checkout-select"><option value="Evening Movie Show">Evening Movie Show</option><option value="Weekend Blockbuster">Weekend Blockbuster</option><option value="Premium Cinema Show">Premium Cinema Show</option></select>
+        <label class="field-label">🕒 Show Time</label><select id="showtimeSelect" class="checkout-select"><option value="3:00 PM">3:00 PM</option><option value="6:30 PM" selected>6:30 PM</option><option value="9:30 PM">9:30 PM</option></select>
+
+        <label class="field-label">🎞️ Screen</label>
+        <select id="screenSelect" class="checkout-select">
+            <option value="Screen 1">Screen 1</option>
+            <option value="Screen 2">Screen 2</option>
+            <option value="Screen 3">Screen 3</option>
+            <option value="Screen 4">Screen 4</option>
+        </select>
+
+        <label class="field-label">💺 Select Your Seat</label>
+        <input type="hidden" id="seatNumber" value="">
+        <div class="screen-label">SCREEN</div>
+        <div class="seat-stage">🎬</div>
+        <div id="seatGrid" class="seat-grid" aria-label="100 theatre seats"></div>
+        <div class="seat-legend"><span>🪑 Available</span><span>🟨 Selected</span></div>
+        <div class="selected-seat-box">Selected Seat: <b id="selectedSeatLabel">None</b></div>
+
+        <div class="delivery-note">🚚 <b>Seat Delivery:</b> The delivery staff will hand over the ordered snacks to <b id="deliveryPreview">your selected seat</b>.</div>
 
 
         <label class="payment-option">
@@ -619,7 +691,7 @@
 
         <h2>Order Placed!</h2>
 
-        <p>Your order has been successfully placed.</p>
+        <p>Your order has been placed. Delivery staff will bring your snacks to your theatre seat.</p>
 
 
         <div class="token">
@@ -632,7 +704,7 @@
 
 
         <p>
-            Estimated preparation time:
+            Estimated preparation / delivery time:
             <b>10–15 minutes</b>
         </p>
 
@@ -652,7 +724,7 @@
 <footer>
 
     <p>
-        © 2026 Smart Canteen Ordering System
+        © 2026 Smart Theatre Food Ordering Management System
         | College Project
     </p>
 

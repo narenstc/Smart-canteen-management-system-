@@ -585,8 +585,10 @@ nav button:hover {
 
 .modal-box {
     background: white;
-    width: 420px;
+    width: 520px;
     max-width: 92%;
+    max-height: 92vh;
+    overflow-y: auto;
     padding: 30px;
     border-radius: 18px;
     position: relative;
@@ -1250,3 +1252,20 @@ nav button:active .nav-icon {
 /* Cinema upgrades */
 .now-showing{max-width:1200px;margin:28px auto;padding:0 20px}.compact-title{margin-bottom:14px}.movie-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.movie-card{overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(255,255,255,.05);box-shadow:0 10px 30px rgba(0,0,0,.2)}.movie-card img{width:100%;height:180px;object-fit:cover}.movie-card>div{padding:16px}.movie-card h3{margin:8px 0 5px}.movie-card p{margin:4px 0 8px;opacity:.75}.movie-tag{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(255,193,7,.15);font-size:12px;font-weight:700}.order-location{opacity:.8;font-size:13px}.seat-grid{max-height:420px;overflow:auto}.seat-btn{min-width:42px}.checkout-select{width:100%;padding:11px;border-radius:10px;margin-bottom:10px}.screen-label{text-align:center;font-weight:800;letter-spacing:4px;margin:10px 0}.seat-stage{text-align:center;font-size:22px;margin-bottom:8px}
 @media(max-width:800px){.movie-grid{grid-template-columns:1fr}.movie-card img{height:150px}}
+
+
+/* Checkout confirmation + reliable seat/image presentation */
+.checkout-confirmation{margin-top:16px;padding:16px;border:2px solid rgba(201,154,59,.45);border-radius:14px;background:linear-gradient(135deg,#fffaf0,#fff);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.checkout-confirmation h3{margin:0 0 10px;color:#7a5312}
+.confirm-row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed #ddd;font-size:14px}.confirm-row:last-child{border-bottom:0}.confirm-row.total{font-size:17px;padding-top:12px}.confirm-order-btn{margin-top:14px;min-height:52px;font-size:16px;font-weight:800}
+.modal-box .full{display:block!important;visibility:visible!important;opacity:1!important;position:relative;z-index:2}.modal-box .qr-box{margin:12px 0}.modal-box .payment-option{cursor:pointer}.modal-box .payment-option input{margin-right:8px}
+.seat-grid{display:grid!important;grid-template-columns:repeat(10,minmax(36px,1fr));gap:8px;max-height:360px;overflow:auto;padding:10px 4px}.seat-btn{border:0;border-radius:8px;padding:9px 3px;background:#17212b;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 3px 7px rgba(0,0,0,.15)}.seat-btn:hover{transform:translateY(-1px)}.seat-btn.selected{background:#e7b93d;color:#241a08;outline:3px solid rgba(231,185,61,.25)}.seat-btn.booked{background:#9b3c3c;color:#fff;cursor:not-allowed;opacity:.75}.selected-seat-box{margin:12px 0;padding:10px;border-radius:10px;background:#f5f5f5;text-align:center}.delivery-bill-box{margin:18px 0;padding:16px;border:2px dashed #c99a3b;border-radius:14px;background:#fffaf0}.delivery-bill-box h3{margin-top:0}.delivery-bill-box p{margin:7px 0}.delivery-highlight{font-weight:800;padding:10px;border-radius:9px;background:#fff0c9}.food-img{background:#171717;object-fit:cover}.theatre-photo{background:#111;min-height:320px;object-fit:cover}
+@media(max-width:600px){.seat-grid{grid-template-columns:repeat(5,minmax(40px,1fr));}.modal-box{padding:20px;max-width:95%;max-height:94vh}.confirm-row{font-size:13px}}
+
+
+/* UPI DEMO PAYMENT */
+.upi-payment-box{text-align:center;max-width:430px}.upi-logo{font-size:46px;margin-bottom:4px}.upi-amount{font-size:22px;margin:12px 0;padding:12px;border-radius:12px;background:#fff7e8}.upi-qr-code{width:190px;height:190px;margin:16px auto;padding:10px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.12)}.upi-qr-code img{max-width:170px;max-height:170px}.upi-id-box{padding:12px;background:#f4f4f4;border-radius:10px;margin:10px 0}.upi-demo-note{font-size:13px;line-height:1.5;padding:12px;margin:12px 0;border-radius:10px;background:#fff8df}.upi-paid-badge{margin-top:10px;padding:10px;border-radius:10px;background:#e8f8ed;color:#147a35;font-weight:700}.qr-box small{display:block;margin-top:5px}.upi-pay-btn{margin-top:12px}.secondary-btn{margin-top:8px}
+
+
+/* Firebase admin live notification panel */
+.firebase-status{margin:10px 0;padding:10px 12px;border-radius:10px;background:#f6f7f9;font-size:13px;font-weight:700}.admin-notification-list{margin-top:12px;display:grid;gap:9px;max-height:320px;overflow:auto}.admin-notification-card{display:grid;gap:4px;padding:12px;border-radius:12px;background:#fff8df;border-left:4px solid #e7b93d;box-shadow:0 3px 12px rgba(0,0,0,.06);font-size:13px}.admin-notification-card b{font-size:15px}.admin-notification-card strong{margin-top:3px}

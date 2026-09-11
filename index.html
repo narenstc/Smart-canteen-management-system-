@@ -75,7 +75,7 @@
 
 
     <div class="theatre-photo-wrap" style="margin-top:28px;">
-        <img class="theatre-photo" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85" alt="Realistic cinema theatre interior">
+        <img class="theatre-photo" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85'" alt="Cinema theatre interior">
     </div>
 
     <div class="theatre-details">
@@ -143,9 +143,9 @@
     </div>
 
     <section class="now-showing"><div class="section-title compact-title"><h2>🎞️ Now Showing</h2><p>Choose a movie before selecting your screen, show time and seat.</p></div><div class="movie-grid">
-<div class="movie-card"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=85" alt="Cinema screen"><div><span class="movie-tag">2D</span><h3>Evening Movie Show</h3><p>Family • Entertainment</p><b>Today • 6:30 PM</b></div></div>
-<div class="movie-card"><img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85" alt="Cinema hall"><div><span class="movie-tag">3D</span><h3>Weekend Blockbuster</h3><p>Action • Adventure</p><b>Today • 9:30 PM</b></div></div>
-<div class="movie-card"><img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=85" alt="Movie theatre"><div><span class="movie-tag">IMAX</span><h3>Premium Cinema Show</h3><p>Adventure • Sci-Fi</p><b>Tomorrow • 3:00 PM</b></div></div></div></section>
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=85" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85\'" alt="Cinema screen"><div><span class="movie-tag">2D</span><h3>Evening Movie Show</h3><p>Family • Entertainment</p><b>Today • 6:30 PM</b></div></div>
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85\'" alt="Cinema hall"><div><span class="movie-tag">3D</span><h3>Weekend Blockbuster</h3><p>Action • Adventure</p><b>Today • 9:30 PM</b></div></div>
+<div class="movie-card"><img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=900&q=85" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85\'" alt="Movie theatre"><div><span class="movie-tag">IMAX</span><h3>Premium Cinema Show</h3><p>Adventure • Sci-Fi</p><b>Tomorrow • 3:00 PM</b></div></div></div></section>
 
     <!-- ADDITIONAL HOME INFORMATION - existing content/options unchanged -->
     <div class="home-info-grid">
@@ -211,7 +211,7 @@
             <option value="all">All Items</option>
             <option value="snacks">Snacks</option>
             <option value="drinks">Drinks</option>
-            <option value="dessert">Desserts</option>
+            <option value="desserts">Desserts</option>
 
         </select>
 
@@ -448,7 +448,14 @@
 
         <div class="admin-panel">
 
-            <h3>📦 Stock Management</h3>
+            <h3>🔔 Live Order Notifications</h3>
+            <p style="margin:8px 0;color:#666">Firebase Firestore syncs new orders from customer phones to this admin dashboard in real time.</p>
+            <div id="firebaseStatus" class="firebase-status">Checking Firebase connection…</div>
+            <button class="primary-btn" onclick="enableAdminNotifications()">🔔 Enable Mobile Notifications</button>
+            <button class="secondary-btn" onclick="testAdminNotification()">🧪 Test Notification</button>
+            <div id="adminNotificationList" class="admin-notification-list"></div>
+
+            <h3 style="margin-top:24px">📦 Stock Management</h3>
 
             <div id="stockList"></div>
 
@@ -570,7 +577,7 @@
         <input
             type="text"
             id="customerDetails"
-            placeholder="Department / Details"
+            placeholder="Mobile Number / Details"
         >
 
         <button
@@ -659,27 +666,47 @@
 
 
         <div class="qr-box">
-
-            <div>▦</div>
-
-            <small>
-                Demo UPI QR
-            </small>
-
+            <div>📱</div>
+            <strong>UPI Payment Ready</strong>
+            <small>Pay securely using the demo UPI option.</small>
+            <button type="button" class="primary-btn full upi-pay-btn" onclick="openUpiPayment()">💳 Pay ₹<span id="upiButtonAmount">0</span> with UPI</button>
+            <div id="upiPaidBadge" class="upi-paid-badge" hidden>✅ UPI Payment Successful</div>
         </div>
 
 
-        <button
-            class="primary-btn full"
-            onclick="placeOrder()"
-        >
-            Confirm Order
+        <div class="checkout-confirmation" id="checkoutConfirmation">
+            <h3>✅ Confirm Your Order</h3>
+            <div class="confirm-row"><span>Customer</span><b id="confirmCustomer">-</b></div>
+            <div class="confirm-row"><span>Theatre</span><b id="confirmTheatre">-</b></div>
+            <div class="confirm-row"><span>Movie / Show</span><b id="confirmShow">-</b></div>
+            <div class="confirm-row"><span>Screen / Seat</span><b id="confirmSeat">-</b></div>
+            <div class="confirm-row total"><span>Total</span><b id="confirmTotal">₹0</b></div>
+        </div>
+
+        <button class="primary-btn full confirm-order-btn" onclick="placeOrder()">
+            ✅ Confirm & Place Order
         </button>
 
     </div>
 
 </div>
 
+
+<!-- DEMO UPI PAYMENT MODAL -->
+<div id="upiPaymentModal" class="modal">
+  <div class="modal-box upi-payment-box">
+    <button class="close-btn" onclick="closeUpiPayment()">×</button>
+    <div class="upi-logo">💳</div>
+    <h2>📱 UPI Payment</h2>
+    <p>Scan the QR or use the UPI ID below to demonstrate payment.</p>
+    <div class="upi-amount">Amount: <b id="upiPayAmount">₹0</b></div>
+    <div id="upiQrCode" class="upi-qr-code"></div>
+    <div class="upi-id-box">UPI ID: <b id="demoUpiId">smarttheatre@upi</b></div>
+    <div class="upi-demo-note">🎓 <b>Expo Demo Mode:</b> This simulates a successful UPI payment. No real money is transferred.</div>
+    <button class="primary-btn full" onclick="simulateUpiPayment()">✅ Simulate Payment Success</button>
+    <button class="secondary-btn full" onclick="closeUpiPayment()">Cancel</button>
+  </div>
+</div>
 
 <!-- SUCCESS -->
 
@@ -734,6 +761,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Firebase for cross-device real-time order sync -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
 
 </body>

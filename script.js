@@ -1,4 +1,130 @@
 // ============================================
+// SMART THEATRE — FIREBASE REAL-TIME ORDER SYNC
+// ============================================
+// Paste your Firebase Web App config here. Firebase Web config values are safe
+// to place in frontend code; protect Firestore with proper Security Rules.
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+let firebaseReady = false;
+let firestoreDb = null;
+let adminNotificationListener = null;
+let adminNotificationsEnabled = false;
+let lastKnownFirebaseOrderIds = new Set();
+
+function isFirebaseConfigured() {
+    return firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_") &&
+           firebaseConfig.projectId && !firebaseConfig.projectId.startsWith("YOUR_");
+}
+
+function initFirebase() {
+    const status = document.getElementById("firebaseStatus");
+    if (!window.firebase) {
+        if (status) status.textContent = "⚠️ Firebase library not loaded";
+        return;
+    }
+    if (!isFirebaseConfigured()) {
+        if (status) status.textContent = "⚙️ Firebase setup required — add your Web App config in script.js";
+        return;
+    }
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firestoreDb = firebase.firestore();
+        firebaseReady = true;
+        if (status) status.textContent = "🟢 Firebase connected — real-time order sync ready";
+        startAdminOrderListener();
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+        if (status) status.textContent = "🔴 Firebase connection failed — check config";
+    }
+}
+
+function formatNotificationItems(order) {
+    return (order.items || []).map(item => `${item.name} × ${item.quantity}`).join(" • ");
+}
+
+function showAdminOrderNotification(order, isNew = true) {
+    const title = isNew ? "🔔 New Theatre Order" : "📦 Theatre Order";
+    const body = `Token ${order.token || "-"} • Seat ${order.seat || "-"} • ₹${order.total || 0}\n${formatNotificationItems(order)}`;
+
+    const list = document.getElementById("adminNotificationList");
+    if (list && isNew) {
+        const card = document.createElement("div");
+        card.className = "admin-notification-card";
+        card.innerHTML = `<b>${title}</b><span>🎫 ${order.token || "-"} • 💺 ${order.seat || "-"}</span><span>👤 ${order.customer?.name || "Customer"}</span><span>🍿 ${formatNotificationItems(order)}</span><strong>💰 ₹${order.total || 0} • ${order.paymentStatus || order.payment || "-"}</strong>`;
+        list.prepend(card);
+        while (list.children.length > 5) list.lastElementChild.remove();
+    }
+
+    if (isNew && adminNotificationsEnabled && "Notification" in window && Notification.permission === "granted") {
+        try { new Notification(title, { body }); } catch (e) { console.warn("Browser notification unavailable", e); }
+    }
+}
+
+function startAdminOrderListener() {
+    if (!firebaseReady || !firestoreDb || adminNotificationListener) return;
+    adminNotificationListener = firestoreDb.collection("smart_theatre_orders")
+        .orderBy("createdAt", "desc")
+        .limit(30)
+        .onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                const data = change.doc.data();
+                if (change.type === "added") {
+                    if (!lastKnownFirebaseOrderIds.has(change.doc.id)) {
+                        showAdminOrderNotification(data, true);
+                    }
+                    lastKnownFirebaseOrderIds.add(change.doc.id);
+                }
+            });
+        }, error => {
+            console.error("Firestore listener error:", error);
+            const status = document.getElementById("firebaseStatus");
+            if (status) status.textContent = "🔴 Firestore listener error — check Security Rules/index";
+        });
+}
+
+async function saveOrderToFirebase(order) {
+    if (!firebaseReady || !firestoreDb) return { ok: false, reason: "Firebase not configured" };
+    try {
+        const cleanOrder = JSON.parse(JSON.stringify(order));
+        cleanOrder.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        await firestoreDb.collection("smart_theatre_orders").doc(String(order.id)).set(cleanOrder);
+        return { ok: true };
+    } catch (error) {
+        console.error("Firebase order sync failed:", error);
+        return { ok: false, reason: error.message || "Firestore write failed" };
+    }
+}
+
+async function enableAdminNotifications() {
+    if (!("Notification" in window)) {
+        alert("This browser does not support notifications.");
+        return;
+    }
+    const permission = await Notification.requestPermission();
+    adminNotificationsEnabled = permission === "granted";
+    if (adminNotificationsEnabled) {
+        alert("✅ Admin notifications enabled. Keep the Admin page open for real-time alerts.");
+    } else {
+        alert("Notification permission was not granted. You can still see live orders inside the Admin dashboard.");
+    }
+}
+
+function testAdminNotification() {
+    const demo = { token:"TEST-101", seat:"A5", total:180, paymentStatus:"UPI Paid", customer:{name:"Demo Customer"}, items:[{name:"Classic Popcorn", quantity:1},{name:"Coke", quantity:1}] };
+    showAdminOrderNotification(demo, true);
+    if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("🔔 Smart Theatre Test", { body:"Admin notification is working!" }); } catch (e) {}
+    }
+}
+
+// ============================================
 // SMART CANTEEN ORDERING SYSTEM
 // ============================================
 
@@ -6,30 +132,30 @@
 // FOOD DATABASE
 
 const foods = [
-  {id:1,name:"Classic Popcorn",category:"popcorn",price:120,stock:100,image:"https://images.unsplash.com/photo-1585647347384-2593bc35786b?auto=format&fit=crop&w=600&q=80",description:"Freshly popped salted cinema popcorn"},
-  {id:2,name:"Cheese Popcorn",category:"popcorn",price:150,stock:100,image:"https://images.unsplash.com/photo-1578849278619-8e9b5c9f2f26?auto=format&fit=crop&w=600&q=80",description:"Crunchy popcorn with cheesy seasoning"},
-  {id:3,name:"Caramel Popcorn",category:"popcorn",price:160,stock:100,image:"https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=600&q=80",description:"Sweet caramel coated popcorn"},
-  {id:4,name:"Nachos with Cheese",category:"snacks",price:140,stock:100,image:"https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600&q=80",description:"Crispy nachos with warm cheese dip"},
-  {id:5,name:"French Fries",category:"snacks",price:110,stock:100,image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80",description:"Crispy golden fries"},
-  {id:6,name:"Peri Peri Fries",category:"snacks",price:130,stock:100,image:"https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=600&q=80",description:"Fries tossed in spicy peri peri seasoning"},
-  {id:7,name:"Chicken Nuggets",category:"chicken",price:160,stock:100,image:"https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&fit=crop&w=600&q=80",description:"Crispy bite-sized chicken nuggets"},
-  {id:8,name:"Chicken Hot Dog",category:"chicken",price:180,stock:100,image:"https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=600&q=80",description:"Juicy chicken hot dog with sauces"},
-  {id:9,name:"Veg Cheese Burger",category:"burgers",price:170,stock:100,image:"https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=600&q=80",description:"Veg patty with cheese and fresh toppings"},
-  {id:10,name:"Chicken Burger",category:"burgers",price:210,stock:100,image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",description:"Crispy chicken burger with cheese"},
-  {id:11,name:"Veg Sandwich",category:"snacks",price:120,stock:100,image:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",description:"Toasted vegetable and cheese sandwich"},
-  {id:12,name:"Cheese Pizza Slice",category:"pizza",price:150,stock:100,image:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80",description:"Hot cheesy pizza slice"},
-  {id:13,name:"Chicken Pizza Slice",category:"pizza",price:190,stock:100,image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",description:"Chicken topped pizza slice"},
-  {id:14,name:"Samosa",category:"snacks",price:50,stock:100,image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",description:"Crispy samosa with spicy filling"},
-  {id:15,name:"Veg Puff",category:"snacks",price:60,stock:100,image:"https://images.unsplash.com/photo-1626776876729-bab4360d5a5a?auto=format&fit=crop&w=600&q=80",description:"Flaky vegetable puff"},
-  {id:16,name:"Chicken Puff",category:"chicken",price:80,stock:100,image:"https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80",description:"Flaky chicken puff"},
-  {id:17,name:"Coke",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?auto=format&fit=crop&w=600&q=80",description:"Chilled Coca-Cola"},
-  {id:18,name:"Pepsi",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=600&q=80",description:"Chilled Pepsi"},
-  {id:19,name:"Fresh Lime Soda",category:"drinks",price:90,stock:100,image:"https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80",description:"Refreshing lime soda"},
-  {id:20,name:"Cold Coffee",category:"drinks",price:120,stock:100,image:"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80",description:"Chilled creamy cold coffee"},
-  {id:21,name:"Chocolate Milkshake",category:"drinks",price:150,stock:100,image:"https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80",description:"Rich chocolate milkshake"},
-  {id:22,name:"Mineral Water",category:"drinks",price:40,stock:100,image:"https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=600&q=80",description:"Chilled mineral water"},
-  {id:23,name:"Ice Cream Cup",category:"desserts",price:100,stock:100,image:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80",description:"Creamy chilled ice cream"},
-  {id:24,name:"Chocolate Brownie",category:"desserts",price:130,stock:100,image:"https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",description:"Warm fudgy chocolate brownie"}
+  {id:1,name:"Classic Popcorn",category:"popcorn",price:120,stock:100,image:"https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=900&q=85",description:"Freshly popped salted cinema popcorn"},
+  {id:2,name:"Cheese Popcorn",category:"popcorn",price:150,stock:100,image:"https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=900&q=85",description:"Crunchy popcorn with cheesy seasoning"},
+  {id:3,name:"Caramel Popcorn",category:"popcorn",price:160,stock:100,image:"https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=900&q=85",description:"Sweet caramel coated popcorn"},
+  {id:4,name:"Nachos with Cheese",category:"snacks",price:140,stock:100,image:"https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=900&q=85",description:"Crispy nachos with warm cheese dip"},
+  {id:5,name:"French Fries",category:"snacks",price:110,stock:100,image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=85",description:"Crispy golden fries"},
+  {id:6,name:"Peri Peri Fries",category:"snacks",price:130,stock:100,image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=85",description:"Fries tossed in spicy peri peri seasoning"},
+  {id:7,name:"Chicken Nuggets",category:"chicken",price:160,stock:100,image:"https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&fit=crop&w=900&q=85",description:"Crispy bite-sized chicken nuggets"},
+  {id:8,name:"Chicken Hot Dog",category:"chicken",price:180,stock:100,image:"https://images.unsplash.com/photo-1612392062631-94dd858cba88?auto=format&fit=crop&w=900&q=85",description:"Juicy chicken hot dog with sauces"},
+  {id:9,name:"Veg Cheese Burger",category:"burgers",price:170,stock:100,image:"https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=900&q=85",description:"Veg patty with cheese and fresh toppings"},
+  {id:10,name:"Chicken Burger",category:"burgers",price:210,stock:100,image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85",description:"Crispy chicken burger with cheese"},
+  {id:11,name:"Veg Sandwich",category:"snacks",price:120,stock:100,image:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=85",description:"Toasted vegetable and cheese sandwich"},
+  {id:12,name:"Cheese Pizza Slice",category:"pizza",price:150,stock:100,image:"https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=85",description:"Hot cheesy pizza slice"},
+  {id:13,name:"Chicken Pizza Slice",category:"pizza",price:190,stock:100,image:"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=900&q=85",description:"Chicken topped pizza slice"},
+  {id:14,name:"Samosa",category:"snacks",price:50,stock:100,image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85",description:"Crispy samosa with spicy filling"},
+  {id:15,name:"Veg Puff",category:"snacks",price:60,stock:100,image:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=85",description:"Flaky vegetable puff"},
+  {id:16,name:"Chicken Puff",category:"chicken",price:80,stock:100,image:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=85",description:"Flaky chicken puff"},
+  {id:17,name:"Coke",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=900&q=85",description:"Chilled Coca-Cola"},
+  {id:18,name:"Pepsi",category:"drinks",price:70,stock:100,image:"https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?auto=format&fit=crop&w=900&q=85",description:"Chilled Pepsi"},
+  {id:19,name:"Fresh Lime Soda",category:"drinks",price:90,stock:100,image:"https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=85",description:"Refreshing lime soda"},
+  {id:20,name:"Cold Coffee",category:"drinks",price:120,stock:100,image:"https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=85",description:"Chilled creamy cold coffee"},
+  {id:21,name:"Chocolate Milkshake",category:"drinks",price:150,stock:100,image:"https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=900&q=85",description:"Rich chocolate milkshake"},
+  {id:22,name:"Mineral Water",category:"drinks",price:40,stock:100,image:"https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=900&q=85",description:"Chilled mineral water"},
+  {id:23,name:"Ice Cream Cup",category:"desserts",price:100,stock:100,image:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=85",description:"Creamy chilled ice cream"},
+  {id:24,name:"Chocolate Brownie",category:"desserts",price:130,stock:100,image:"https://images.unsplash.com/photo-1606313564200-e75d5e30476f?auto=format&fit=crop&w=900&q=85",description:"Warm fudgy chocolate brownie"}
 ];
 
 
@@ -40,14 +166,16 @@ localStorage.removeItem("canteenOrders");
 localStorage.removeItem("canteenFavorites");
 localStorage.removeItem("canteenCoupon");
 
-let cart =
-    JSON.parse(localStorage.getItem("theatreCart")) || [];
+let cart = JSON.parse(localStorage.getItem("theatreCart")) || [];
+cart = cart.filter(item => foods.some(f => f.id === item.id));
+localStorage.setItem("theatreCart", JSON.stringify(cart));
 
 let orders =
     JSON.parse(localStorage.getItem("theatreOrders")) || [];
 
-let currentUser =
-    JSON.parse(localStorage.getItem("theatreCustomer") || localStorage.getItem("canteenUser")) || null;
+let currentUser = JSON.parse(localStorage.getItem("theatreCustomer")) || null;
+if (currentUser && !currentUser.name && currentUser.customerName) currentUser.name=currentUser.customerName;
+if (currentUser && !currentUser.customerId && currentUser.studentId) currentUser.customerId=currentUser.studentId;
 
 let latestOrder =
     JSON.parse(localStorage.getItem("latestOrder")) || null;
@@ -137,6 +265,7 @@ function displayMenu() {
                 src="${food.image}"
                 class="food-img"
                 alt="${food.name}"
+                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=900&q=85'"
             >
 
             <div class="food-info">
@@ -495,73 +624,26 @@ function closeLogin() {
 
 
 function login() {
-
-    const name =
-        document.getElementById("customerName")
-        .value.trim();
-
-    const id =
-        document.getElementById("customerId")
-        .value.trim();
-
-    const department =
-        document.getElementById("customerDetails")
-        .value.trim();
-
-
-    if (!name || !id || !department) {
-
-        alert("Please fill all student details.");
-
-        return;
-    }
-
-
-    currentUser = { name, studentId: id, department, customerName: name, customerId: id, customerDetails: department };
-
-
-    localStorage.setItem(
-        "theatreCustomer",
-        JSON.stringify(currentUser)
-    );
-
-
-    document.getElementById("userDisplay")
-        .textContent = name;
-
-
+    const name = document.getElementById("customerName").value.trim();
+    const id = document.getElementById("customerId").value.trim();
+    const details = document.getElementById("customerDetails").value.trim();
+    if (!name || !id || !details) { alert("Please fill Customer Name, Customer ID and Mobile Number / Details."); return; }
+    currentUser = { name, customerId:id, customerDetails:details };
+    localStorage.setItem("theatreCustomer", JSON.stringify(currentUser));
+    document.getElementById("userDisplay").textContent = name;
     closeLogin();
-
     alert(`Welcome ${name}!`);
-
 }
 
 
 // CHECKOUT
 
 function checkout() {
-
-    if (cart.length === 0) {
-
-        alert("Your cart is empty.");
-
-        return;
-    }
-
-
-    if (!currentUser) {
-
-        openLogin();
-
-        alert("Please login before checkout.");
-
-        return;
-    }
-
-
-    document.getElementById("checkoutModal")
-        .classList.add("show");
-
+    if (!cart.length) { alert("Your cart is empty."); return; }
+    if (!currentUser) { openLogin(); alert("Please login before checkout."); return; }
+    document.getElementById("checkoutModal").classList.add("show");
+    buildSeatGrid();
+    updateCheckoutConfirmation();
 }
 
 
@@ -573,132 +655,133 @@ function closeCheckout() {
 }
 
 
+// SEAT SELECTION — 100 seats (A1-J10)
+let selectedSeat = localStorage.getItem("theatreSelectedSeat") || "";
+function buildSeatGrid() {
+    const grid = document.getElementById("seatGrid");
+    if (!grid) return;
+    const booked = new Set(orders.flatMap(o => o.seat ? [o.seat] : []));
+    let html = "";
+    for (let r=0; r<10; r++) {
+        const row=String.fromCharCode(65+r);
+        for (let n=1; n<=10; n++) {
+            const seat=row+n, isBooked=booked.has(seat), isSelected=selectedSeat===seat;
+            html += `<button type="button" class="seat-btn ${isBooked?'booked':''} ${isSelected?'selected':''}" ${isBooked?'disabled':''} onclick="selectSeat('${seat}')" title="Seat ${seat}">${seat}</button>`;
+        }
+    }
+    grid.innerHTML=html;
+    const label=document.getElementById("selectedSeatLabel"); if(label) label.textContent=selectedSeat || "None";
+    const hidden=document.getElementById("seatNumber"); if(hidden) hidden.value=selectedSeat;
+    const preview=document.getElementById("deliveryPreview"); if(preview) preview.textContent=selectedSeat || "your selected seat";
+}
+function selectSeat(seat) {
+    selectedSeat=seat; localStorage.setItem("theatreSelectedSeat", seat); buildSeatGrid(); updateCheckoutConfirmation();
+}
+function updateCheckoutConfirmation() {
+    const customer=document.getElementById("confirmCustomer");
+    const theatre=document.getElementById("confirmTheatre");
+    const show=document.getElementById("confirmShow");
+    const seat=document.getElementById("confirmSeat");
+    const total=document.getElementById("confirmTotal");
+    if(customer) customer.textContent=currentUser ? `${currentUser.name} (${currentUser.customerId || '-'})` : "-";
+    if(theatre) theatre.textContent=document.getElementById("theatreSelect")?.value || "-";
+    if(show) show.textContent=`${document.getElementById("movieSelect")?.value || '-'} • ${document.getElementById("showtimeSelect")?.value || '-'}`;
+    if(seat) seat.textContent=`${document.getElementById("screenSelect")?.value || '-'} • ${selectedSeat || 'Select a seat'}`;
+    if(total) total.textContent=`₹${getTotals().total}`;
+    const upiBtnAmount=document.getElementById("upiButtonAmount"); if(upiBtnAmount) upiBtnAmount.textContent=getTotals().total;
+}
+
+// DEMO UPI PAYMENT
+let demoUpiPaid = false;
+let demoUpiTransactionId = "";
+const DEMO_UPI_ID = "smarttheatre@upi";
+
+function openUpiPayment() {
+    const total = getTotals().total;
+    const modal = document.getElementById("upiPaymentModal");
+    if (!modal) return;
+    const amountEl = document.getElementById("upiPayAmount");
+    const buttonAmount = document.getElementById("upiButtonAmount");
+    if (amountEl) amountEl.textContent = `₹${total}`;
+    if (buttonAmount) buttonAmount.textContent = total;
+    const idEl = document.getElementById("demoUpiId");
+    if (idEl) idEl.textContent = DEMO_UPI_ID;
+    const qr = document.getElementById("upiQrCode");
+    if (qr) {
+        qr.innerHTML = "";
+        if (typeof QRCode !== "undefined") {
+            const upiUrl = `upi://pay?pa=${encodeURIComponent(DEMO_UPI_ID)}&pn=Smart%20Theatre&am=${total}&cu=INR`;
+            new QRCode(qr, {text: upiUrl, width:170, height:170});
+        } else {
+            qr.textContent = "QR library unavailable";
+        }
+    }
+    modal.classList.add("show");
+}
+
+function closeUpiPayment() {
+    document.getElementById("upiPaymentModal")?.classList.remove("show");
+}
+
+function simulateUpiPayment() {
+    const total = getTotals().total;
+    demoUpiPaid = true;
+    demoUpiTransactionId = "UPI-DEMO-" + Date.now().toString().slice(-8);
+    const badge = document.getElementById("upiPaidBadge");
+    if (badge) { badge.hidden = false; badge.textContent = `✅ UPI Paid • ${demoUpiTransactionId}`; }
+    closeUpiPayment();
+    updateCheckoutConfirmation();
+    alert(`Demo UPI payment successful!\nAmount: ₹${total}\nTransaction ID: ${demoUpiTransactionId}`);
+}
+
 // PLACE ORDER
 
 function placeOrder() {
-
-    const payment =
-        document.querySelector(
-            'input[name="payment"]:checked'
-        ).value;
-
-
-    const totals = getTotals();
-
-
-    const token =
-        "SC" +
-        String(
-            Math.floor(
-                100 + Math.random() * 900
-            )
-        );
-
-
-    const invoice =
-        "INV-" +
-        Date.now().toString().slice(-7);
-
-
-    const order = {
-
-        id: Date.now(),
-
-        token,
-
-        invoice,
-
-        student: currentUser,
-
-        items: cart.map(item => ({
-
-            id: item.id,
-
-            name: item.name,
-
-            quantity: item.quantity,
-
-            price: item.price
-
-        })),
-
-        subtotal: totals.subtotal,
-
-        discount: totals.discount,
-
-        gst: totals.gst,
-
-        serviceFee: totals.serviceFee,
-
-        total: totals.total,
-
-        payment,
-
-        paymentStatus:
-            payment === "UPI"
-                ? "Paid"
-                : "Pay at Counter",
-
-        status: "Placed",
-
-        time: new Date().toLocaleString(),
-
-        estimatedTime: "10–15 minutes"
-
+    const paymentEl=document.querySelector('input[name="payment"]:checked');
+    if (!paymentEl) { alert("Please select a payment method."); return; }
+    if (!selectedSeat) { alert("Please select your theatre seat before confirming the order."); return; }
+    const payment=paymentEl.value;
+    if (payment === "UPI" && !demoUpiPaid) {
+        openUpiPayment();
+        alert("Please complete the demo UPI payment first.");
+        return;
+    }
+    const totals=getTotals();
+    const token="ST"+String(Math.floor(100+Math.random()*900));
+    const invoice="INV-"+Date.now().toString().slice(-7);
+    const theatre=document.getElementById("theatreSelect").value;
+    const movie=document.getElementById("movieSelect").value;
+    const showtime=document.getElementById("showtimeSelect").value;
+    const screen=document.getElementById("screenSelect").value;
+    const order={
+        id:Date.now(), token, invoice, customer:currentUser, student:currentUser,
+        theatre, movie, showtime, screen, seat:selectedSeat,
+        delivery:{recipientName:currentUser.name,recipientId:currentUser.customerId,seat:selectedSeat,instruction:`Deliver snacks to seat ${selectedSeat}`},
+        items:cart.map(item=>({id:item.id,name:item.name,quantity:item.quantity,price:item.price})),
+        subtotal:totals.subtotal,discount:totals.discount,gst:totals.gst,serviceFee:totals.serviceFee,total:totals.total,
+        coupon:appliedCoupon?.code || "", payment, paymentStatus:payment==="UPI"?"Paid":"Pay at Counter", transactionId:payment==="UPI"?demoUpiTransactionId:"", status:"Placed",
+        time:new Date().toLocaleString(), estimatedTime:"10–15 minutes"
     };
-
-
     orders.unshift(order);
+    order.items.forEach(item=>{const food=foods.find(f=>f.id===item.id);if(food) food.stock=Math.max(0,food.stock-item.quantity);});
+    latestOrder=order;
+    localStorage.setItem("theatreOrders",JSON.stringify(orders));
+    localStorage.setItem("latestOrder",JSON.stringify(latestOrder));
 
-
-    // UPDATE STOCK
-
-    order.items.forEach(item => {
-
-        const food =
-            foods.find(food => food.id === item.id);
-
-        if (food) {
-
-            food.stock -= item.quantity;
-
+    // Cross-device sync: customer phone -> Firebase -> admin phone/dashboard.
+    // LocalStorage remains as an offline fallback for the customer side.
+    saveOrderToFirebase(order).then(result => {
+        if (result.ok) {
+            console.log("✅ Order synced to Firebase:", order.token);
+        } else {
+            console.warn("Firebase sync skipped:", result.reason);
         }
-
     });
 
-
-    latestOrder = order;
-
-
-    localStorage.setItem(
-        "theatreOrders",
-        JSON.stringify(orders)
-    );
-
-    localStorage.setItem(
-        "latestOrder",
-        JSON.stringify(latestOrder)
-    );
-
-
-    cart = [];
-
-    appliedCoupon = null;
-    localStorage.removeItem("theatreCoupon");
-    saveCart();
-
-    updateCartCount();
-
+    cart=[]; appliedCoupon=null; demoUpiPaid=false; demoUpiTransactionId=""; localStorage.removeItem("theatreCoupon"); saveCart(); updateCartCount();
     closeCheckout();
-
-
-    document.getElementById("tokenNumber")
-        .textContent = token;
-
-
-    document.getElementById("successModal")
-        .classList.add("show");
-
+    document.getElementById("tokenNumber").textContent=token;
+    document.getElementById("successModal").classList.add("show");
 }
 
 
@@ -856,251 +939,24 @@ function openOrderBill(id) {
 // BILL
 
 function displayBill() {
-
-    const container =
-        document.getElementById("billContent");
-
-
-    if (!latestOrder) {
-
-        container.innerHTML = `
-
-            <div class="bill">
-
-                <h2>No bill available.</h2>
-
-                <p>
-                    Place an order to generate a bill.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    const order = latestOrder;
-
-
-    container.innerHTML = `
-
-        <div class="bill">
-
-            <div class="bill-header">
-
-                <h1>🍽️ SMART CANTEEN</h1>
-
-                <p>
-                    College Campus Canteen
-                </p>
-
-                <p>
-                    Pollachi, Tamil Nadu
-                </p>
-
-                <br>
-
-                <h2>INVOICE / BILL</h2>
-
-            </div>
-
-
-            <div class="bill-meta">
-
-                <div>
-
-                    <b>Invoice No:</b>
-                    ${order.invoice}
-
-                    <br>
-
-                    <b>Order Token:</b>
-                    ${order.token}
-
-                    <br>
-
-                    <b>Date:</b>
-                    ${order.time}
-
-                </div>
-
-
-                <div>
-
-                    <b>Student:</b>
-                    ${order.student.name}
-
-                    <br>
-
-                    <b>Student ID:</b>
-                    ${order.student.studentId}
-
-                    <br>
-
-                    <b>Department:</b>
-                    ${order.student.department}
-
-                </div>
-
-            </div>
-
-
-            <table class="bill-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>Food Item</th>
-
-                        <th>Qty</th>
-
-                        <th>Price</th>
-
-                        <th>Amount</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    ${order.items.map((item,index) => `
-
-                        <tr>
-
-                            <td>${index + 1}</td>
-
-                            <td>${item.name}</td>
-
-                            <td>${item.quantity}</td>
-
-                            <td>₹${item.price}</td>
-
-                            <td>
-                                ₹${item.price * item.quantity}
-                            </td>
-
-                        </tr>
-
-                    `).join("")}
-
-                </tbody>
-
-            </table>
-
-
-            <div class="bill-total">
-
-                <div>
-
-                    <span>Subtotal</span>
-
-                    <strong>
-                        ₹${order.subtotal}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>Discount</span>
-
-                    <strong>
-                        -₹${order.discount}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>GST (5%)</span>
-
-                    <strong>
-                        ₹${order.gst}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>Service Fee</span>
-
-                    <strong>
-                        ₹${order.serviceFee}
-                    </strong>
-
-                </div>
-
-
-                <div class="grand-total">
-
-                    <span>Grand Total</span>
-
-                    <strong>
-                        ₹${order.total}
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div style="margin-top:20px">
-
-                <p>
-                    <b>Payment Method:</b>
-                    ${order.payment}
-                </p>
-
-                <p>
-                    <b>Payment Status:</b>
-                    ${order.paymentStatus}
-                </p>
-
-                <p>
-                    <b>Order Status:</b>
-                    ${order.status}
-                </p>
-
-                <p>
-                    <b>Estimated Preparation:</b>
-                    ${order.estimatedTime}
-                </p>
-
-                ${order.coupon ? `<p><b>Coupon Applied:</b> ${order.coupon}</p>` : ""}
-
-            </div>
-
-
-            <div class="bill-contact"><b>📞 Canteen Contact:</b> +91 98765 43210</div>
-
-            <div class="bill-thanks">
-
-                <h3>Thank You! 🙏</h3>
-
-                <p>
-                    Please show your token at the counter.
-                </p>
-
-                <p>
-                    Smart Canteen — Fast • Simple • Smart
-                </p>
-
-            </div>
-
-        </div>
-
-    `;
-
+    const container=document.getElementById("billContent");
+    if(!latestOrder){container.innerHTML=`<div class="bill"><h2>No bill available.</h2><p>Place an order to generate a bill.</p></div>`;return;}
+    const order=latestOrder, customer=order.customer||order.student||{};
+    container.innerHTML=`<div class="bill">
+      <div class="bill-header">
+        <h1>🎬 SMART THEATRE</h1>
+        <p>Theatre Food & Snacks</p>
+        <p>${order.theatre||"Madurai, Tamil Nadu"}</p>
+        <br><h2>INVOICE / BILL</h2>
+      </div>
+      <div class="bill-meta"><div><b>Invoice No:</b> ${order.invoice}<br><b>Order Token:</b> ${order.token}<br><b>Date:</b> ${order.time}</div>
+      <div><b>Customer:</b> ${customer.name||"-"}<br><b>Customer ID:</b> ${customer.customerId||"-"}<br><b>Mobile / Details:</b> ${customer.customerDetails||"-"}</div></div>
+      <div class="delivery-bill-box"><h3>🚚 SEAT DELIVERY DETAILS</h3><p><b>Theatre:</b> ${order.theatre||"-"}</p><p><b>Movie:</b> ${order.movie||"-"}</p><p><b>Show Time:</b> ${order.showtime||"-"}</p><p><b>Screen:</b> ${order.screen||"-"}</p><p><b>Seat:</b> <strong>${order.seat||"-"}</strong></p><p><b>Deliver To:</b> ${customer.name||"-"} (${customer.customerId||"-"})</p><p class="delivery-highlight">🍿 Deliver ordered snacks directly to Seat ${order.seat||"-"}</p></div>
+      <table class="bill-table"><thead><tr><th>#</th><th>Food Item</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead><tbody>${order.items.map((item,index)=>`<tr><td>${index+1}</td><td>${item.name}</td><td>${item.quantity}</td><td>₹${item.price}</td><td>₹${item.price*item.quantity}</td></tr>`).join("")}</tbody></table>
+      <div class="bill-total"><div><span>Subtotal</span><strong>₹${order.subtotal}</strong></div><div><span>Discount</span><strong>-₹${order.discount}</strong></div><div><span>GST (5%)</span><strong>₹${order.gst}</strong></div><div><span>Service Fee</span><strong>₹${order.serviceFee}</strong></div><div class="grand-total"><span>Grand Total</span><strong>₹${order.total}</strong></div></div>
+      <div style="margin-top:20px"><p><b>Payment Method:</b> ${order.payment}</p><p><b>Payment Status:</b> ${order.paymentStatus}</p><p><b>Order Status:</b> ${order.status}</p><p><b>Estimated Preparation:</b> ${order.estimatedTime}</p>${order.coupon?`<p><b>Coupon Applied:</b> ${order.coupon}</p>`:""}</div>
+      <div class="bill-contact"><b>📞 Theatre Food Support:</b> +91 98765 43210</div><div class="bill-thanks"><h3>Thank You! 🙏</h3><p>Please keep your token. Delivery staff will bring your snacks to your seat.</p><p>Smart Theatre — Fast • Simple • Smart</p></div>
+    </div>`;
 }
 
 
@@ -1131,14 +987,14 @@ function printBill() {
 
     doc.setFontSize(18);
     doc.setFont(undefined, "bold");
-    doc.text("SMART CANTEEN", 105, y, { align: "center" });
+    doc.text("SMART THEATRE", 105, y, { align: "center" });
     y += 8;
 
     doc.setFontSize(11);
     doc.setFont(undefined, "normal");
-    doc.text("College Campus Canteen", 105, y, { align: "center" });
+    doc.text("Theatre Food & Snacks", 105, y, { align: "center" });
     y += 6;
-    doc.text("Pollachi, Tamil Nadu", 105, y, { align: "center" });
+    doc.text(safe(order.theatre || "Madurai, Tamil Nadu"), 105, y, { align: "center" });
     y += 10;
 
     doc.setFontSize(14);
@@ -1163,11 +1019,17 @@ function printBill() {
     doc.text(`Generated Date: ${generatedDate}`, 15, y);
     doc.text(`Generated Time: ${generatedTime}`, 115, y);
     y += 6;
-    doc.text(`Student: ${safe(order.student?.name)}`, 15, y);
+    doc.text(`Customer: ${safe((order.customer||order.student)?.name)}`, 15, y);
     y += 6;
-    doc.text(`Student ID: ${safe(order.student?.studentId)}`, 15, y);
+    doc.text(`Customer ID: ${safe((order.customer||order.student)?.customerId || (order.customer||order.student)?.studentId)}`, 15, y);
     y += 6;
-    doc.text(`Department: ${safe(order.student?.department)}`, 15, y);
+    doc.text(`Theatre: ${safe(order.theatre)}`, 15, y);
+    y += 6;
+    doc.text(`Movie: ${safe(order.movie)}  |  Show: ${safe(order.showtime)}`, 15, y);
+    y += 6;
+    doc.text(`Screen: ${safe(order.screen)}  |  SEAT: ${safe(order.seat)}`, 15, y);
+    y += 6;
+    doc.text(`DELIVER SNACKS TO SEAT: ${safe(order.seat)}`, 15, y);
     y += 9;
 
     doc.setFont(undefined, "bold");
@@ -1226,6 +1088,8 @@ function printBill() {
     doc.text(`Order Status: ${safe(order.status)}`, 15, y);
     y += 6;
     doc.text(`Estimated Preparation: ${safe(order.estimatedTime)}`, 15, y);
+    y += 6;
+    doc.text(`Delivery Customer: ${safe((order.customer||order.student)?.name)} (${safe((order.customer||order.student)?.customerId || (order.customer||order.student)?.studentId)})`, 15, y);
     y += 12;
 
     doc.setFontSize(12);
@@ -1481,7 +1345,7 @@ function displayAdmin() {
     const uniqueCustomers =
         new Set(
             orders.map(
-                order => order.student.studentId
+                order => (order.student?.customerId || order.student?.studentId || order.customer?.customerId || order.customer?.studentId || "unknown")
             )
         ).size;
 
@@ -1571,7 +1435,7 @@ function displayFavorites() {
     const list = foods.filter(f => favorites.includes(f.id));
     if (!list.length) { grid.innerHTML = `<div class="option-card"><h3>No favourites yet ❤️</h3><p>Tap the heart on any food item to save it here.</p><button class="primary-btn" onclick="showPage('menu')">Browse Menu</button></div>`; return; }
     grid.innerHTML = list.map(food => `
-        <div class="food-card"><img src="${food.image}" class="food-img" alt="${food.name}"><div class="food-info">
+        <div class="food-card"><img src="${food.image}" class="food-img" alt="${food.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=900&q=85'"><div class="food-info">
         <div class="food-title-row"><h3>${food.name}</h3><button class="favorite-btn active" onclick="toggleFavorite(${food.id})">♥</button></div>
         <p>${food.description}</p><span class="price">₹${food.price}</span><div class="food-bottom"><button class="add-btn" onclick="addToCart(${food.id})">+ Add</button></div></div></div>`).join("");
 }
@@ -1602,6 +1466,12 @@ function saveReview(id) {
 }
 function displayContact() { /* Contact is static and also printed on bills. */ }
 
+
+function attachCheckoutListeners() {
+    ["theatreSelect","movieSelect","showtimeSelect","screenSelect"].forEach(id=>document.getElementById(id)?.addEventListener("change",updateCheckoutConfirmation));
+    document.querySelectorAll('input[name="payment"]').forEach(el=>el.addEventListener("change",()=>{ if(el.checked && el.value!=="UPI"){ demoUpiPaid=false; demoUpiTransactionId=""; } updateCheckoutConfirmation(); }));
+}
+
 // INITIALIZE
 
 document.addEventListener(
@@ -1611,6 +1481,8 @@ document.addEventListener(
         updateCartCount();
 
         displayMenu();
+        attachCheckoutListeners();
+        buildSeatGrid();
 
         displayAdmin();
 
@@ -1651,7 +1523,7 @@ function renderHistoryOrders(list, title) {
     box.innerHTML = `<div class="history-grid">${list.slice().reverse().map(order => `
         <div class="history-card">
             <div class="history-head"><strong>Order #${order.id || "-"}</strong><span>${formatHistoryDate(order)}</span></div>
-            <p><b>Student:</b> ${order.student?.name || "-"} (${order.student?.studentId || "-"})</p>
+            <p><b>Customer:</b> ${(order.customer||order.student)?.name || "-"} (${(order.customer||order.student)?.customerId || (order.customer||order.student)?.studentId || "-"})</p>
             <p><b>Status:</b> ${order.status || "-"}</p>
             <p><b>Payment:</b> ${order.paymentStatus || order.payment || "-"}</p>
             <div class="history-items">${(order.items || []).map(i => `<div>${i.name} × ${i.quantity} <span>₹${((i.price || 0) * (i.quantity || 0)).toFixed(2)}</span></div>`).join("")}</div>
@@ -1730,3 +1602,9 @@ function generateSiteQR() {
     new QRCode(box, { text: url, width: 220, height: 220 });
     if (urlBox) urlBox.textContent = url;
 }
+
+
+// FIREBASE STARTUP
+window.addEventListener("load", () => {
+    initFirebase();
+});
